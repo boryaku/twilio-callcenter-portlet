@@ -1,0 +1,65 @@
+/**
+ * Copyright (c) Pure Source, LLC All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+.ui-dialog-titlebar {
+    display:none;
+}
+
+.ui-dialog  .ui-dialog-content{
+    background-color: black;
+    border: 0;
+    opacity: .9;
+}
+
+li.statusConnecting{
+    background: url(../images/dockbar/telephone_black-32.png) no-repeat;
+    height: 32px;
+    width: 32px;
+}
+
+li.statusConnected{
+    background: url(../images/dockbar/telephone_blue-32.png) no-repeat;
+    height: 32px;
+    width: 32px;
+}
+
+input[type="button"].connectCall{
+    background: url(../images/dockbar/telephone_blue-32.png) no-repeat;
+    height: 32px;
+    width: 32px;
+    background-color: white;
+}
+
+input[type="button"].disconnectCall{
+    background: url(../images/dockbar/telephone_black-32.png) no-repeat;
+    height: 32px;
+    width: 32px;
+    background-color: white;
+}
+
+span.dialogClose{
+    font-size: smaller;
+    font-style: italic;
+    float: right;
+    cursor: pointer;
+}
+
+div.softPhone{
+    display: none;
+    color: white;
+}
+
+div.incomingCall{
+    display: none;
+    color: white;
+}
