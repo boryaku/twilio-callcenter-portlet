@@ -1,4 +1,7 @@
 <script type="text/javascript">
+
+    var connection;
+
     $(document).ready(function(){
 
         $("#incomingCall").dialog({
@@ -31,9 +34,10 @@
         });
 
         Twilio.Device.incoming(function (conn) {
+            connection = conn;
             $("#incomingCall").dialog('open');
             $("#incomingCall").show();
-            conn.accept();
+            $('#incomingText').html('<p>Call from '+conn.parameters.From+'</p>');
         });
 
         Twilio.Device.ready(function (device) {
@@ -55,14 +59,11 @@
         });
 
         Twilio.Device.connect(function (conn) {
-            $('#status').text("Connected");
             toggleCallStatus();
         });
 
         Twilio.Device.disconnect(function (conn) {
-            $('#status').text("Call ended");
             toggleCallStatus();
-            $('#status').text('Ready');
         });
 
         function toggleCallStatus(){
@@ -70,12 +71,25 @@
             $('#hangup').toggle();
         }
     });
+
+    function declineIncoming(){
+        connection.disconnect();
+        $('#incomingCall').dialog('close');
+    }
+
+    function acceptIncoming(){
+        connection.accept();
+        $('#acceptCall').hide();
+    }
 </script>
 
 <li id="status" class="statusConnecting"></li>
 
 <div id="incomingCall" class="incomingCall">
-<span class="dialogClose" id="incomingCallDialogClose" onclick="$('#incomingCall').dialog('close');">[x]</span>
+    <span class="dialogClose" id="incomingCallDialogClose" onclick="declineIncoming();">[x]</span>
+    <div id="incomingText"></div>
+    <input type="button" id="acceptCall" value="" class="connectCall" alt="Call" onclick="acceptIncoming();"/>
+    <input type="button" id="hangupCall" value="" class="disconnectCall" alt="End Call" onclick="declineIncoming();"/>
 </div>
 
 <div id="softPhone" class="softPhone">
