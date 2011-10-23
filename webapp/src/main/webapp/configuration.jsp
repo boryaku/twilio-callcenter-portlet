@@ -23,22 +23,6 @@
     <input name="<portlet:namespace /><%=Constants.CMD%>" type="hidden" value="<%=Constants.UPDATE%>" />
 
 <table>
-<tr>
-    <td><label style="font-size: larger;">PUBNUB Publish Key:</label></td>
-    <td> <input name="<portlet:namespace />pub" value="${PUB_KEY}" class="nubpub_chat_input"/></td>
-</tr>
-<tr>
-    <td><label style="font-size: larger;">PUBNUB Subscribe Key:</label></td>
-    <td> <input name="<portlet:namespace />sub" value="${SUB_KEY}" class="nubpub_chat_input"/></td>
-</tr>
- <tr>
-    <td><label style="font-size: larger;">PUBNUB SSL Security:</label></td>
-    <td> <select name="<portlet:namespace />ssl" class="nubpub_chat_select">
-            <option ${SSL_KEY eq "Off" ? 'selected=\"selected\"' : ''}>Off</option>
-            <option ${SSL_KEY eq "On" ? 'selected=\"selected\"' : ''}>On</option>
-         </select>
-    </td>
-</tr>
 </table>
 <input type="button" value="Save" onClick="submitForm(document.<portlet:namespace />fm);" />
 </form>
