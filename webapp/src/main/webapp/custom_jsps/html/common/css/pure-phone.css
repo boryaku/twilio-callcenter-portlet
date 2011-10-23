@@ -16,13 +16,13 @@
 }
 
 .ui-dialog{
-    background-color: black;
+    background-color: #FBEC5D;
     border: 0;
     opacity: .9;
 }
 
 .ui-dialog  .ui-dialog-content{
-    background-color: black;
+    background-color: #FBEC5D;
     border: 0;
     opacity: .9;
 }
@@ -37,6 +37,7 @@ li.statusConnected{
     background: url(../images/dockbar/telephone_blue-32.png) no-repeat;
     height: 32px;
     width: 32px;
+    cursor: pointer;
 }
 
 input[type="button"].connectCall{
@@ -52,18 +53,19 @@ input[type="button"].disconnectCall{
 }
 
 span.dialogClose{
-    font-size: smaller;
-    font-style: italic;
+    background: url(../images/cancel_round.png) no-repeat;
+    height: 16px;
+    width: 16px;
     float: right;
     cursor: pointer;
 }
 
 div.softPhone{
     display: none;
-    color: white;
+    color: black;
 }
 
 div.incomingCall{
     display: none;
-    color: white;
+    color: black;
 }

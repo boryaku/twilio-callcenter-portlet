@@ -87,9 +87,9 @@
         }
     });
 
-    function declineIncoming(){
+    function disconnect(element){
         connection.disconnect();
-        $('#incomingCall').dialog('close');
+        $('#'+element).dialog('close');
     }
 
     function acceptIncoming(){
@@ -101,14 +101,14 @@
 <li id="status" class="statusConnecting"></li>
 
 <div id="incomingCall" class="incomingCall">
-    <span class="dialogClose" id="incomingCallDialogClose" onclick="declineIncoming();">[x]</span>
+    <span class="dialogClose" id="incomingCallDialogClose" onclick="disconnect('incomingCall');"></span>
     <div id="incomingText"></div>
     <input type="button" id="acceptCall" value="" class="connectCall" alt="Call" onclick="acceptIncoming();"/>
-    <input type="button" id="hangupCall" value="" class="disconnectCall" alt="End Call" onclick="declineIncoming();"/>
+    <input type="button" id="hangupCall" value="" class="disconnectCall" alt="End Call" onclick="disconnect('incomingCall');"/>
 </div>
 
 <div id="softPhone" class="softPhone">
-    <span class="dialogClose" id="softPhoneDialogClose" onclick="$('#softPhone').dialog('close');">[x]</span>
+    <span class="dialogClose" id="softPhoneDialogClose" onclick="disconnect('softPhone');"></span>
     <br/>
     Who would you like to call?<br/>
     <input type="text" id="client_to_call" name="client_to_call"/>
