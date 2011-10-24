@@ -13,22 +13,22 @@
  */
 package com.ps.cc.controller;
 
-import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.model.User;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.ps.cc.configuration.Action;
+import com.ps.cc.model.TwilioConfiguration;
 import com.twilio.sdk.client.TwilioCapability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
-import javax.portlet.PortletRequest;
-import java.util.Date;
+import javax.portlet.RenderRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,47 +42,51 @@ import java.util.Map;
 public class Init {
     private Logger logger = LoggerFactory.getLogger(Init.class);
 
+    public static final String ACCT_SID = "ACCT_SID";
+    public static final String AUTH_TOKEN = "AUTH_TOKEN";
+    public static final String APP_SID = "APP_SID";
+
     @RequestMapping
-    public String index(ModelMap map, PortletRequest request){
+    public String index(ModelMap map, RenderRequest renderRequest) throws Exception{
+        String portletResource = "purePhone_WAR_twiliocallcenterportlet";
+        PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(renderRequest, portletResource);
 
-        try{
-            User user =  PortalUtil.getUser(request);
-            map.addAttribute("user", user);
+        TwilioConfiguration twilioConfiguration = new TwilioConfiguration();
+        twilioConfiguration.setAcctSid(prefs.getValue(ACCT_SID,""));
+        twilioConfiguration.setAuthToken(prefs.getValue(AUTH_TOKEN,""));
+        twilioConfiguration.setAppSid(prefs.getValue(APP_SID,""));
 
-            String portletResource = "purePhone_WAR_purephone";
-            PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
-
-            String acctSid = prefs.getValue(Action.ACCT_SID, "AC4a96626e76164b2ba24a708d956f45df");
-            String authToken = prefs.getValue(Action.AUTH_TOKEN, "22ad3656de217ebe17b8308ac236c61b");
-            String appSid = prefs.getValue(Action.APP_SID, "AP55c85930482a4826850334b21c0a372a");
-
-            TwilioCapability capability = new TwilioCapability(acctSid, authToken);
-
-            capability.allowEventStream(null);
-            capability.allowClientIncoming(user.getScreenName());
-
-            Map<String, String> params = new HashMap<String, String>();
-
-            capability.allowClientOutgoing(appSid, params);
-
-            String token = null;
-            try {
-                token = capability.generateToken();
-
-            } catch (TwilioCapability.DomainException e) {
-                e.printStackTrace();
-            }
-
-            //get the current group's user list and their availability ie. online or not...
-            ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-
-            map.addAttribute(Action.AUTH_TOKEN, token);
-
-            map.addAttribute("now", new Date().getTime());
-        }catch (Exception ex){
-            logger.error("Init exception", ex);
-        }
+        map.addAttribute("command", twilioConfiguration);
 
         return "index";
     }
+
+    @ActionMapping(params = "action=saveTwilioConfiguration")
+    public void saveTwilioConfiguration(@ModelAttribute TwilioConfiguration twilioConfiguration, ActionRequest actionRequest) throws Exception{
+        String portletResource = "purePhone_WAR_twiliocallcenterportlet";
+
+        PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
+        prefs.setValue(ACCT_SID, twilioConfiguration.getAcctSid());
+        prefs.setValue(AUTH_TOKEN, twilioConfiguration.getAuthToken());
+        prefs.setValue(APP_SID, twilioConfiguration.getAppSid());
+        prefs.store();
+
+        User user = PortalUtil.getUser(actionRequest);
+
+        TwilioCapability capability = new TwilioCapability(twilioConfiguration.getAcctSid(), twilioConfiguration.getAuthToken());
+
+        capability.allowEventStream(null);
+        capability.allowClientIncoming(user.getScreenName());
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("portraitId", String.valueOf(user.getPortraitId()));
+
+        capability.allowClientOutgoing(twilioConfiguration.getAppSid(), params);
+
+        String token = capability.generateToken();
+
+        //Now we will share the json object with everyone
+        PortalUtil.getHttpServletRequest(actionRequest).getSession().setAttribute("USER_twilio_token", token);
+    }
+
 }

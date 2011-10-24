@@ -52,7 +52,8 @@
             connection = conn;
             $("#incomingCall").dialog('open');
             $("#incomingCall").show();
-            $('#incomingText').html('<p>Call from '+conn.parameters.From+'</p>');
+            var img = '<img class=\"avatar\" src=\"/image/user_male_portrait?img_id='+conn.parameters.portraitId+'&t='+new Date()+'\" width=\"25px\"/>';
+            $('#incomingText').html('<p>'+img+' '+conn.parameters.From+' </p>');
         });
 
         Twilio.Device.ready(function (device) {
@@ -88,7 +89,8 @@
     });
 
     function disconnect(element){
-        connection.disconnect();
+        if(connection != null)
+            connection.disconnect();
         $('#'+element).dialog('close');
     }
 

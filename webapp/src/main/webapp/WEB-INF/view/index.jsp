@@ -1,3 +1,6 @@
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="portlet" uri="http://java.sun.com/portlet_2_0" %>
+
 <%--
 /**
  * Copyright (c) Pure Source, LLC All rights reserved.
@@ -13,67 +16,25 @@
  * details.
  */
 --%>
-<div class="configure_group_phone" style="display: block;">
-    <span style="padding: 10px;">The Phone Portlet needs configuration...</span>
-    </span>
-</div>
+<portlet:actionURL var="saveTwilioConfigurationUrl">
+	<portlet:param name="action" value="saveTwilioConfiguration" />
+</portlet:actionURL>
 
-<div>
-<button class="call" onclick="call();">
-Call
-</button>
-<button class="hangup" onclick="hangup();">
-Hangup
-</button>
-<input type="text" id="number" name="number"
-placeholder="Enter a phone number or client to call"/>
-<div id="log">Establishing connectivity...</div>
-</div>
+<form:form name="twilioConfiguration" id="twilioConfiguration" method="post" action="${saveTwilioConfigurationUrl}">
+    <table>
+        <tr>
+            <td><label style="font-size: larger;">ACCOUNT Sid:</label></td>
+            <td> <form:input path="acctSid" class="twilio_input"/></td>
+        </tr>
+        <tr>
+            <td><label style="font-size: larger;">AUTH Token:</label></td>
+            <td><form:input path="authToken" class="twilio_input"/></td>
+        </tr>
+         <tr>
+            <td><label style="font-size: larger;">App SID:</label></td>
+            <td><form:input path="appSid" class="twilio_input"/></td>
+        </tr>
+    </table>
+    <input type="submit"/>
+</form:form>
 
-<ul id="people"/>
-
-<script type="text/javascript">
-Twilio.Device.setup("${AUTH_TOKEN}");
-
-Twilio.Device.ready(function (device) {
-$("#log").text("Client '${user.screenName}' is ready");
-});
-Twilio.Device.error(function (error) {
-$("#log").text("Error: " + error.message);
-});
-Twilio.Device.connect(function (conn) {
-$("#log").text("Successfully established call");
-});
-Twilio.Device.disconnect(function (conn) {
-$("#log").text("Call ended");
-});
-Twilio.Device.incoming(function (conn) {
-$("#log").text("Incoming connection from " + conn.parameters.From);
-// accept the incoming connection and start two-way audio
-conn.accept();
-});
-
-Twilio.Device.presence(function (pres) {
-if (pres.available) {
-// create an item for the client that became available
-$("<li>", {id: pres.from, text: pres.from}).click(function () {
-$("#number").val(pres.from);
-call();
-}).prependTo("#people");
-}
-else {
-// find the item by client name and remove it
-$("#" + pres.from).remove();
-}
-});
-
-function call() {
-// get the phone number or client to connect the call to
-params = {"PhoneNumber": $("#number").val()};
-Twilio.Device.connect(params);
-}
-
-function hangup() {
-Twilio.Device.disconnectAll();
-}
-</script>

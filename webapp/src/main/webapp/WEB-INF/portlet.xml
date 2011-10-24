@@ -33,7 +33,7 @@
         </supports>
         <supported-locale>en</supported-locale>
         <portlet-info>
-            <title>Soft Phone</title>
+            <title>Twilio Configuration</title>
         </portlet-info>
     </portlet>
 
