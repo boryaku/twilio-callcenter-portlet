@@ -21,6 +21,7 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.ps.cc.controller.Init;
+import com.ps.cc.model.TwilioConfiguration;
 import com.twilio.sdk.client.TwilioCapability;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +30,9 @@ import javax.portlet.PortletPreferences;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,13 +54,20 @@ public class LoginAction extends Action {
 			long userId = PortalUtil.getUserId(request);
 
             User user = UserLocalServiceUtil.getUserById(companyId, userId);
+            TwilioConfiguration twilioConfiguration = new TwilioConfiguration();
 
-            String portletResource = "purePhone_WAR_twiliocallcenterportlet";
-            PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(request,portletResource);
+            try{
+                File file = new File("twilioConfiguration.txt");
+                ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+                twilioConfiguration = (TwilioConfiguration)in.readObject();
+                in.close();
+            }catch (Exception ex){
+                //didn't exist...
+            }
 
-            String acctSid = prefs.getValue(Init.ACCT_SID,""); //"AC4a96626e76164b2ba24a708d956f45df";
-            String authToken = prefs.getValue(Init.AUTH_TOKEN,""); //"22ad3656de217ebe17b8308ac236c61b";
-            String appSid = prefs.getValue(Init.APP_SID,""); //"AP55c85930482a4826850334b21c0a372a";
+            String acctSid = twilioConfiguration.getAcctSid();
+            String authToken = twilioConfiguration.getAuthToken();
+            String appSid = twilioConfiguration.getAppSid();
 
             TwilioCapability capability = new TwilioCapability(acctSid, authToken);
 

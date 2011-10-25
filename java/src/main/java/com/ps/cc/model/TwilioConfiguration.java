@@ -1,12 +1,14 @@
 package com.ps.cc.model;
 
 
+import java.io.Serializable;
+
 /**
  * Author: cnbuckley
  * Date: 10/24/11
  * Time: 9:18 AM
  */
-public class TwilioConfiguration {
+public class TwilioConfiguration implements Serializable {
 
     private String acctSid;
     private String authToken;

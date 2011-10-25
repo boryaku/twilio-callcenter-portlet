@@ -29,6 +29,7 @@ import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletPreferences;
 import javax.portlet.RenderRequest;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,13 +49,17 @@ public class Init {
 
     @RequestMapping
     public String index(ModelMap map, RenderRequest renderRequest) throws Exception{
-        String portletResource = "purePhone_WAR_twiliocallcenterportlet";
-        PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(renderRequest, portletResource);
 
         TwilioConfiguration twilioConfiguration = new TwilioConfiguration();
-        twilioConfiguration.setAcctSid(prefs.getValue(ACCT_SID,""));
-        twilioConfiguration.setAuthToken(prefs.getValue(AUTH_TOKEN,""));
-        twilioConfiguration.setAppSid(prefs.getValue(APP_SID,""));
+
+        try{
+            File file = new File("twilioConfiguration.txt");
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+            twilioConfiguration = (TwilioConfiguration)in.readObject();
+            in.close();
+        }catch (Exception ex){
+            //didn't exist...
+        }
 
         map.addAttribute("command", twilioConfiguration);
 
@@ -65,11 +70,9 @@ public class Init {
     public void saveTwilioConfiguration(@ModelAttribute TwilioConfiguration twilioConfiguration, ActionRequest actionRequest) throws Exception{
         String portletResource = "purePhone_WAR_twiliocallcenterportlet";
 
-        PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
-        prefs.setValue(ACCT_SID, twilioConfiguration.getAcctSid());
-        prefs.setValue(AUTH_TOKEN, twilioConfiguration.getAuthToken());
-        prefs.setValue(APP_SID, twilioConfiguration.getAppSid());
-        prefs.store();
+        ObjectOutput out = new ObjectOutputStream(new FileOutputStream("twilioConfiguration.txt"));
+        out.writeObject(twilioConfiguration);
+        out.close();
 
         User user = PortalUtil.getUser(actionRequest);
 
