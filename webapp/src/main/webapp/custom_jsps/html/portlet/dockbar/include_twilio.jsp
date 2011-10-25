@@ -50,10 +50,22 @@
 
         Twilio.Device.incoming(function (conn) {
             connection = conn;
-            $("#incomingCall").dialog('open');
-            $("#incomingCall").show();
-            var img = '<img class=\"avatar\" src=\"/image/user_male_portrait?img_id='+conn.parameters.portraitId+'&t='+new Date()+'\" width=\"25px\"/>';
-            $('#incomingText').html('<p>'+img+' '+conn.parameters.From+' </p>');
+
+            var screenName = conn.parameters.From.split(":")[1];
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if(xhr.readyState == 4) {
+                    var user = eval('(' + xhr.responseText + ')');
+                    var img = '<img class=\"avatar\" src=\"/image/user_male_portrait?img_id='+user.portraitId+'&t='+new Date()+'\" width=\"25px\"/>';
+                    $('#incomingText').html('<p>'+img+' '+user.fullName+' Calling.</p>');
+                    $("#incomingCall").dialog('open');
+                    $("#incomingCall").show();
+                }
+            };
+            var url = '/group/control_panel/manage?p_p_id=purePhone_WAR_twiliocallcenterportlet&p_p_lifecycle=2&p_p_resource_id=json_user&screenname='+screenName;
+
+            xhr.open("GET", url, true);
+            xhr.send();
         });
 
         Twilio.Device.ready(function (device) {
@@ -89,8 +101,7 @@
     });
 
     function disconnect(element){
-        if(connection != null)
-            connection.disconnect();
+        Twilio.Device.disconnectAll();
         $('#'+element).dialog('close');
     }
 
@@ -98,6 +109,7 @@
         connection.accept();
         $('#acceptCall').hide();
     }
+
 </script>
 
 <li id="status" class="statusConnecting"></li>

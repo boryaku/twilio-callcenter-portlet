@@ -13,8 +13,11 @@
  */
 package com.ps.cc.controller;
 
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.ps.cc.model.TwilioConfiguration;
@@ -24,11 +27,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
+import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.PortletPreferences;
-import javax.portlet.RenderRequest;
+import javax.portlet.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +52,6 @@ public class Init {
 
     @RequestMapping
     public String index(ModelMap map, RenderRequest renderRequest) throws Exception{
-
         TwilioConfiguration twilioConfiguration = new TwilioConfiguration();
 
         try{
@@ -68,8 +70,6 @@ public class Init {
 
     @ActionMapping(params = "action=saveTwilioConfiguration")
     public void saveTwilioConfiguration(@ModelAttribute TwilioConfiguration twilioConfiguration, ActionRequest actionRequest) throws Exception{
-        String portletResource = "purePhone_WAR_twiliocallcenterportlet";
-
         ObjectOutput out = new ObjectOutputStream(new FileOutputStream("twilioConfiguration.txt"));
         out.writeObject(twilioConfiguration);
         out.close();
@@ -88,8 +88,21 @@ public class Init {
 
         String token = capability.generateToken();
 
-        //Now we will share the json object with everyone
         PortalUtil.getHttpServletRequest(actionRequest).getSession().setAttribute("USER_twilio_token", token);
     }
+
+	@ResourceMapping("json_user")
+	public String getIncomingCallUser(ModelMap modelMap, ResourceRequest request, ResourceResponse response) throws Exception {
+        User user =
+                UserLocalServiceUtil.getUserByScreenName(PortalUtil.getCompanyId(request), request.getParameter("screenname"));
+
+        JSONObject jsonObj = JSONFactoryUtil.createJSONObject();
+        jsonObj.put("fullName", user.getFullName());
+        jsonObj.put("portraitId", user.getPortraitId());
+
+        modelMap.addAttribute("user", jsonObj.toString());
+
+		return "json_user";
+	}
 
 }
