@@ -1,0 +1,33 @@
+/**
+ * Copyright (c) Pure Source, LLC All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+This Plugin is a combination hook and control panel Portlet and it allows Liferay users 6.0.5 and above (I wrote it against 6.1) to have a Soft Phone client that uses Twilio as the voice service.  The hook extends the "dockbar" to display an icon in the top right hand side next to the "Go To" link.  If the phone is black then it's either not configured or is still connecting when the phone icon is blue you are connected and can make calls.  In order to make a call you will need to know the users "screen name" you can find this from the "Directory" portlet, a nice extension would be to enable calling from the directory portlet.  So the portlet installs just like any portlet plugin and adds a custom jsp hook, a post login hook, and a control panel portlet for configuration.
+
+
+To Build the Portlet you will need Maven http://maven.apache.org/
+
+Once you have Maven you then simply type "mvn install" and in the webapp/target directory you will have the war file
+to deploy to Liferay.
+
+Also you will need to manually install the the Twilio Java Client in your local repository.
+https://github.com/twilio/twilio-java
+
+In our POM we reference it like this.
+        <dependency>
+          <groupId>com.twilio</groupId>
+          <artifactId>twilio-java</artifactId>
+          <version>3.0.0</version>
+        </dependency>
+
+Here's instructions on installing and configuring the Portlet.
+http://www.puresrc.com/wiki/-/wiki/Main/Twilio+Call+Center
