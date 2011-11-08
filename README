@@ -30,4 +30,5 @@ In our POM we reference it like this.
         </dependency>
 
 Here's instructions on installing and configuring the Portlet.
-http://www.puresrc.com/wiki/-/wiki/Main/Twilio+Call+Center
+
+http://www.puresrc.com/web/guest/knowledge
